@@ -1,0 +1,88 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head> <!-- Informações que não serão transpostas visualmente para o usuário -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <title>Exercício do Pássaro</title>
+    <style>
+        body /* Código HTML que fará o site aparecer */ {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;  }
+    </style>
+</head>
+<body>
+<script>
+//Inicia o Phaser dentro da tag <body> e defini as propriedades gerais do ambiente:
+var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var game = new Phaser.Game(config);
+    var passarinho;
+
+    //Carrega os arquivos (nesse caso, uma imagem e um spritesheet)
+    function preload() {
+        this.load.image('bg', 'assets/bg_space.png');
+        this.load.spritesheet('bird', 'assets/bird-purple.png', {frameWidth: 75, frameHeight: 75}); //O tipo de arquivo de imagem spritesheet reune frames de movimentação de um personagem ou de um elemento do jogo
+    }
+
+    //Defini as propriedades iniciais dos objetos que fazem parte do jogo
+    function create() {
+        this.add.image(400, 300, 'bg').setScale(1.2); //define as dimensões da imagem de fundo
+        passarinho = this.add.sprite(100, 300, 'bird').setScale(1.3); //atribui à variável 'passarinho' o spritesheet do personagem com suas coordenadas e escala inicial
+        //Configura uma animação:
+        this.anims.create({
+            key: 'fly', //nome da animação
+            frames: this.anims.generateFrameNumbers('bird', {start:0, end:7}), //Define os frames que serão usados (start:0 e end:7 definem que serão usados 8 frames presentes no arquivo 'bird' mencionado anteriormente)
+            frameRate: 10, //Quantidade de frames em 1 segundo
+            repeat: -1 
+            // '-1' indica que haverá repetição contínua;
+            // '0' indica que não haverá repetição;
+            // Um numéro positivo indica a quantidade de repetições.
+        })
+        passarinho.anims.play('fly',true);
+    }
+    //Comandos que serão atualizados a todo momento no jogo
+    function update() { 
+        //Pensando no eixo horizontal (x), se o passarinho estiver na posição inicial (definida anteriormente como 100)...
+        if (passarinho.x === 100){
+            //... então a face do passarinho fica voltada para a direita...
+            passarinho.setFlip(false, false);
+            //...e então o passarinho está pronto para a ida
+            passarinho.ida = true;
+        }
+        //Se o passarinho estiver numa posição anterior ao limite direito e estiver pronto para a ida...
+        if (passarinho.x < 700 && passarinho.ida === true){
+            console.log('Passarinho avança para a direita');
+            //...então o passarinho avança para a direita aumentando sua posição em 5 espaços por vez.
+            passarinho.x += 5;         
+        }
+        //Se o passarinho atingir o limite direito...
+        if (passarinho.x === 700){
+            //...então a face do passarinho se direciona para a esquerda...
+            passarinho.setFlip(true, false);
+            //... e então o passarinho não está pronto para ida, mas aim para retornar a posição de origem
+            passarinho.ida = false;
+        }
+        //Se o passarinho estiver numa posição superior a inicial e não estiver na posição de ida (estiver em posição de retorno)...
+        if (passarinho.x > 100 && passarinho.ida === false){
+            console.log('Passarinho retorna à posição inicial avançando para a esquerda');
+            //...então o passarinho retorna a posição inicial avançando para a esquerda 5 espaços por vez
+            passarinho.x -= 5;
+        }
+        }
+</script>
+</body>
+</html>
