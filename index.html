@@ -29,19 +29,29 @@ var config = {
         }
     };
 
+    //Decala as variaveis que serão usadas posteriormente
     var game = new Phaser.Game(config);
     var passarinho;
+    var sol;
+    var lua;
 
-    //Carrega os arquivos (nesse caso, uma imagem e um spritesheet)
+    //Carrega os arquivos que serão usados posteriormente
     function preload() {
-        this.load.image('bg', 'assets/bg_space.png');
+        this.load.image('bg', 'assets/bg.jpg');
         this.load.spritesheet('bird', 'assets/bird-purple.png', {frameWidth: 75, frameHeight: 75}); //O tipo de arquivo de imagem spritesheet reune frames de movimentação de um personagem ou de um elemento do jogo
+        this.load.image('sol', 'assets/sol.png');
+        this.load.image('lua', 'assets/lua.png');
     }
 
-    //Defini as propriedades iniciais dos objetos que fazem parte do jogo
+    //Cria e defini as propriedades iniciais dos arquivos (objetos da animação):
     function create() {
-        this.add.image(400, 300, 'bg').setScale(1.2); //define as dimensões da imagem de fundo
-        passarinho = this.add.sprite(100, 300, 'bird').setScale(1.3); //atribui à variável 'passarinho' o spritesheet do personagem com suas coordenadas e escala inicial
+        this.add.image(400, 300, 'bg').setScale(2.0); //define as dimensões da imagem de fundo
+        passarinho = this.add.sprite(170, 300, 'bird').setScale(1.3); //cria e define as dimenões iniciais dp passáro
+        sol = this.add.image(70, 300, 'sol').setScale(0.25);
+        sol.alpha = 1;
+        lua = this.add.image(730, 300, 'lua').setScale(0.2);
+        lua.alpha = 1;
+        
         //Configura uma animação:
         this.anims.create({
             key: 'fly', //nome da animação
@@ -51,37 +61,69 @@ var config = {
             // '-1' indica que haverá repetição contínua;
             // '0' indica que não haverá repetição;
             // Um numéro positivo indica a quantidade de repetições.
+
         })
+
+        //Inicia a animação configurada:
         passarinho.anims.play('fly',true);
     }
+    
     //Comandos que serão atualizados a todo momento no jogo
     function update() { 
-        //Pensando no eixo horizontal (x), se o passarinho estiver na posição inicial (definida anteriormente como 100)...
-        if (passarinho.x === 100){
-            //... então a face do passarinho fica voltada para a direita...
+        //Se o passarinho estiver na posição inicial dele (170), a face do passarinho se volta para a adireita e prepara para ida (ida=true)
+        if (passarinho.x === 170){
             passarinho.setFlip(false, false);
-            //...e então o passarinho está pronto para a ida
             passarinho.ida = true;
         }
-        //Se o passarinho estiver numa posição anterior ao limite direito e estiver pronto para a ida...
-        if (passarinho.x < 700 && passarinho.ida === true){
+
+        //Passarinho avança para a direita
+        if (passarinho.x < 620 && passarinho.ida === true){
             console.log('Passarinho avança para a direita');
-            //...então o passarinho avança para a direita aumentando sua posição em 5 espaços por vez.
-            passarinho.x += 5;         
+            passarinho.x += 2;
+        
+            //Se o passarinho não chegou na metade da tela (400), ele sobe
+            if (passarinho.x < 400) {
+                passarinho.y -= 0.5; 
+            }
+            //Se o passarinho já passou da metade da tela (400), ele desce
+            else {
+                passarinho.y += 0.5;
+            }
         }
-        //Se o passarinho atingir o limite direito...
-        if (passarinho.x === 700){
-            //...então a face do passarinho se direciona para a esquerda...
+
+        //Se o passarinho atingir o limite direito (620), a face do passinho se volta para a esquerda e prepara para voltar (ida=false)
+        if (passarinho.x >= 620){
             passarinho.setFlip(true, false);
-            //... e então o passarinho não está pronto para ida, mas aim para retornar a posição de origem
             passarinho.ida = false;
         }
-        //Se o passarinho estiver numa posição superior a inicial e não estiver na posição de ida (estiver em posição de retorno)...
-        if (passarinho.x > 100 && passarinho.ida === false){
+
+        //Passarinho avança para a esquerda
+        if (passarinho.x > 170 && passarinho.ida === false){
             console.log('Passarinho retorna à posição inicial avançando para a esquerda');
-            //...então o passarinho retorna a posição inicial avançando para a esquerda 5 espaços por vez
-            passarinho.x -= 5;
+            passarinho.x -= 2; 
+
+            ////Se o passarinho já passou da metade da tela (400), ele desce
+            if (passarinho.x > 400) {
+                passarinho.y += 0.5; // 
+            }
+            //Se o passarinho não chegou na metade da tela (400), ele sobe
+            else {
+                passarinho.y -= 0.5; // 
+            }
         }
+            //Sempre que o passarinho ainda não tenha atingido a metade da tela (400), o sol fica "aceso" e lua "apagada".
+            while(passarinho.x<400){
+                sol.alpha = 1.0;
+                lua.alpha = 0.5;
+                break;
+            }
+                //Sempre que o passarinho atingir a metade da tela (400), o sol fica "apagado" e lua "acesa".
+                while(passarinho.x>400){
+                sol.alpha = 0.5;
+                lua.alpha = 1.0;
+                break;
+            }
+
         }
 </script>
 </body>
